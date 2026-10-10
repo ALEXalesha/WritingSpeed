@@ -93,5 +93,5 @@ if (!app.requestSingleInstanceLock()) {
   app.on('window-all-closed', () => app.quit());
 }
 
-// Для проверок (tests-app/writing-speed.spec.js читает это через app.evaluate)
+// Для проверок (tests-app/writing-speed-app.spec.js читает это через app.evaluate)
 globalThis.__ws = { TEST, VERSION, PAGE, SIZE, get win() { return win; }, stateFile };
