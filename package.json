@@ -1,0 +1,27 @@
+{
+  "name": "writingspeed",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WritingSpeed: offline typing speed test in one HTML page - time, words, quotes, custom text and zen; six languages and code; WPM, accuracy, mistakes by key; Electron app for Windows",
+  "author": "ALEXalesha",
+  "license": "MIT",
+  "homepage": "https://alexalesha.github.io/WritingSpeed/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ALEXalesha/WritingSpeed.git"
+  },
+  "scripts": {
+    "start": "electron electron",
+    "dist": "electron-builder --projectDir electron --win nsis portable --x64",
+    "test": "playwright test",
+    "test:unit": "node --test tests/electron.unit.js",
+    "mutate": "node tests/mutate.js",
+    "screenshots": "node tools/screenshots.js",
+    "icon": "node electron/make-icon.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "electron": "44.4.5",
+    "electron-builder": "26.15.3"
+  }
+}
