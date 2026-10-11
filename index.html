@@ -27,6 +27,7 @@
   --glass-border-strong: rgba(255, 255, 255, 0.32);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   --blur: blur(28px) saturate(190%);
+  --glass-sat: 190%;
   --text: #f4f4f8;
   --text-dim: rgba(244, 244, 248, 0.62);
   --accent: #5b8def;
@@ -54,6 +55,7 @@
   --glass-border-strong: rgba(255, 255, 255, 0.20);
   --glass-shadow: 0 6px 20px rgba(0, 0, 0, 0.32);
   --blur: blur(20px) saturate(120%);
+  --glass-sat: 120%;
   --text: #e6e8ec;
   --text-dim: rgba(230, 232, 236, 0.55);
   --accent: #4a7ab8;
@@ -73,6 +75,7 @@
   --glass-border-strong: rgba(22, 26, 38, 0.26);
   --glass-shadow: 0 6px 20px rgba(30, 40, 70, 0.14);
   --blur: blur(18px) saturate(130%);
+  --glass-sat: 130%;
   --text: #1b2030;
   --text-dim: rgba(27, 32, 48, 0.62);
   --accent: #3a6fd8;
@@ -94,6 +97,7 @@
   --glass-border-strong: rgba(255, 255, 255, 0.17);
   --glass-shadow: 0 6px 22px rgba(0, 0, 0, 0.55);
   --blur: blur(18px) saturate(110%);
+  --glass-sat: 110%;
   --text: #dcdde3;
   --text-dim: rgba(220, 221, 227, 0.52);
   --accent: #4668a8;
@@ -113,6 +117,7 @@
   --glass-border-strong: rgba(255, 226, 190, 0.28);
   --glass-shadow: 0 8px 26px rgba(30, 16, 6, 0.45);
   --blur: blur(22px) saturate(150%);
+  --glass-sat: 150%;
   --text: #f5ead9;
   --text-dim: rgba(245, 234, 217, 0.60);
   --accent: #d08a3c;
@@ -141,10 +146,21 @@ button, select, input, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .app { max-width: 1100px; margin: 0 auto; padding: 14px 16px 28px; display: flex; flex-direction: column; gap: 14px; min-height: 100vh; }
+/* Стекло панелей без backdrop-filter (жалоба 1.1.0: при наведении на кнопку меню светлела нижняя
+   половина панели). backdrop-filter заново читает то, что под панелью, и на видеокарте при перерисовке
+   одной кнопки Chromium пересчитывал размытие только в полосе панели, захватывая уже нарисованную
+   панель, - полоса светлела. Под панелями всегда один и тот же неподвижный фон темы, размывать там
+   нечего: его копия с background-attachment: fixed и обычным filter: saturate даёт тот же вид без
+   чтения подложки. Диалоги непрозрачные, а у подсказки и всплывашки нет кнопок - им своё ниже. */
 .glass {
   background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 18px;
-  box-shadow: var(--glass-shadow); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--glass-shadow); position: relative; isolation: isolate;
 }
+.glass::before, .glass::after { content: ''; position: absolute; inset: -1px; border-radius: inherit; z-index: -1; pointer-events: none; }
+.glass::before { background: var(--app-bg); background-color: var(--app-base); background-attachment: fixed; filter: saturate(var(--glass-sat)); }
+.glass::after { background: var(--glass-bg); border: 1px solid var(--glass-border); }
+.dialog.glass::before, .dialog.glass::after, .toast.glass::before, .toast.glass::after, .ime.glass::before, .ime.glass::after { content: none; }
+.toast.glass, .ime.glass { backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); }
 header.top { display: flex; align-items: center; gap: 12px; padding: 10px 14px; flex-wrap: wrap; }
 .brand { display: flex; align-items: center; gap: 10px; margin-right: auto; }
 .brand svg { width: 34px; height: 34px; flex: none; }
@@ -463,7 +479,7 @@ th { color: var(--text-dim); font-weight: 600; font-size: 12px; }
 <script>
 'use strict';
 (() => {
-const VERSION = '1.1.0';
+const VERSION = '1.1.1';
 
 // WORDS:BEGIN - создаётся tools/make-words.py, руками не править.
 // Частоты: wordfreq 3.1.1 (CC BY-SA 4.0), сито: словари Hunspell, без грубых слов.
