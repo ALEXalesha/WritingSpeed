@@ -14,7 +14,11 @@
 # (кроме имён и названий из списка DE_NAMES). wordfreq хранит ß как ss и œ как oe - слово
 # возвращается к словарному написанию.
 #
-# Запуск (нужны pip install wordfreq==3.1.1 spylls и папка со словарями <язык>.aff/.dic):
+# Китайский (zh): упрощённые иероглифы из wordfreq, только слова из иероглифов, без грубых слов
+# и имён политиков; словарь Hunspell не нужен. Для каждого слова - пиньинь без тонов (pypinyin):
+# блок WORDS_PY, режим «пиньинь латиницей» и подсказка над иероглифами.
+#
+# Запуск (нужны pip install wordfreq==3.1.1 spylls pypinyin==0.55.0 и папка со словарями <язык>.aff/.dic):
 #   python tools/make-words.py <папка словарей>
 # Скрипт заменяет в index.html блок между строками «// WORDS:BEGIN» и «// WORDS:END».
 import base64
@@ -158,6 +162,22 @@ def proper_names(dics):
     return names
 
 
+HAN_WORD = re.compile(r'^[\u4e00-\u9fff]{1,4}$')
+
+
+def build_zh(block):
+    rules = [block['*'], block['zh']]
+    out, seen = [], set()
+    for w in wordfreq.iter_wordlist('zh'):
+        if not HAN_WORD.match(w) or w in seen or any(r.search(w) for r in rules):
+            continue
+        seen.add(w)
+        out.append(w)
+        if len(out) >= TOTAL:
+            break
+    return out
+
+
 def main():
     dic_dir = sys.argv[1]
     block = blocklist()
@@ -170,13 +190,21 @@ def main():
             raise SystemExit(f'{lang}: только {len(words)} слов')
         data[lang] = ' '.join(words)
         print(lang, len(words), ' '.join(words[:40]))
+    from pypinyin import lazy_pinyin
+    zh = build_zh(block)
+    if len(zh) < TOTAL:
+        raise SystemExit(f'zh: только {len(zh)} слов')
+    data['zh'] = ' '.join(zh)
+    zh_py = ' '.join(''.join(lazy_pinyin(w)) for w in zh)
     lines = ['// WORDS:BEGIN - создаётся tools/make-words.py, руками не править.',
              '// Частоты: wordfreq 3.1.1 (CC BY-SA 4.0), сито: словари Hunspell, без грубых слов.',
              '// Этот блок данных - под лицензией CC BY-SA 4.0 (остальной код страницы - MIT).',
              'const WORDS = {']
-    for lang in LANGS:
+    for lang in LANGS + ['zh']:
         lines.append(f'  {lang}: {json.dumps(data[lang], ensure_ascii=False)},')
     lines.append('};')
+    lines.append('// Пиньинь без тонов к словам WORDS.zh, по порядку (pypinyin 0.55.0, MIT).')
+    lines.append(f'const WORDS_PY = {{ zh: {json.dumps(zh_py)} }};')
     lines.append('// WORDS:END')
     with open(PAGE, encoding='utf-8') as f:
         html = f.read()
