@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- «Скорость печати» / WritingSpeed - тест скорости печати одной страницей, без сети.
-     Режимы: время, число слов, цитаты, свой текст, дзен. Шесть языков и код (JS, Python),
+     Режимы: время, число слов, текст, свой текст, дзен. Шесть языков и код (JS, Python),
      списки 200/1000/5000 частых слов, знаки, цифры, заглавные, «без Backspace», «стоп на
      ошибке». Итог: WPM/CPM, чистая и «сырая» скорость, точность, ровность, график по
      секундам, ошибки по клавишам на раскладке, рекорды и история (localStorage).
@@ -11,7 +11,7 @@
 <meta charset="UTF-8">
 <meta name="application-name" content="Скорость печати">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Тест скорости печати: время, слова, цитаты, свой текст и дзен; шесть языков и код; статистика по клавишам. Работает без интернета.">
+<meta name="description" content="Тест скорости печати: время, слова, текст, свой текст и дзен; шесть языков и код; статистика по клавишам. Работает без интернета.">
 <meta name="color-scheme" content="dark light">
 <title>Скорость печати / WritingSpeed</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='14' width='56' height='36' rx='9' fill='%235b8def'/%3E%3Cg fill='%23fff'%3E%3Crect x='12' y='22' width='7' height='6' rx='1.5'/%3E%3Crect x='22' y='22' width='7' height='6' rx='1.5'/%3E%3Crect x='32' y='22' width='7' height='6' rx='1.5'/%3E%3Crect x='42' y='22' width='10' height='6' rx='1.5'/%3E%3Crect x='12' y='32' width='10' height='6' rx='1.5'/%3E%3Crect x='25' y='32' width='7' height='6' rx='1.5'/%3E%3Crect x='35' y='32' width='7' height='6' rx='1.5'/%3E%3Crect x='45' y='32' width='7' height='6' rx='1.5'/%3E%3Crect x='18' y='41' width='28' height='4' rx='2'/%3E%3C/g%3E%3C/svg%3E">
@@ -479,7 +479,7 @@ th { color: var(--text-dim); font-weight: 600; font-size: 12px; }
 <script>
 'use strict';
 (() => {
-const VERSION = '1.1.1';
+const VERSION = '1.1.2';
 
 // WORDS:BEGIN - создаётся tools/make-words.py, руками не править.
 // Частоты: wordfreq 3.1.1 (CC BY-SA 4.0), сито: словари Hunspell, без грубых слов.
@@ -1929,8 +1929,10 @@ function drawGraph(canvas, series, opts) {
     series.forEach((p, i) => (i ? g.lineTo(X(i), Y(p[key] || 0)) : g.moveTo(X(i), Y(p[key] || 0))));
     g.stroke();
   };
-  if (lines.includes('raw')) { g.globalAlpha = 0.6; line('raw', text, 1.5); g.globalAlpha = 1; }
-  if (lines.includes('wpm')) line('wpm', accent, 2.5);
+  // одна точка (первый тест в истории, тест короче секунды) - линии нет, рисуется точкой
+  const dot = (key, color, r) => { g.fillStyle = color; g.beginPath(); g.arc(X(0), Y(series[0][key] || 0), r, 0, Math.PI * 2); g.fill(); };
+  if (lines.includes('raw')) { g.globalAlpha = 0.6; if (series.length === 1) dot('raw', text, 3); else line('raw', text, 1.5); g.globalAlpha = 1; }
+  if (lines.includes('wpm')) { if (series.length === 1) dot('wpm', accent, 4.5); else line('wpm', accent, 2.5); }
   g.fillStyle = danger;
   series.forEach((p, i) => { if (p.err) { g.beginPath(); g.arc(X(i), Y(p.wpm || 0), 2.5 + Math.min(4, p.err), 0, Math.PI * 2); g.fill(); } });
 }
@@ -1938,7 +1940,8 @@ function drawGraph(canvas, series, opts) {
 // Раскладка карты: язык теста, а в дзене и своём тексте - по набранным буквам
 function layoutFor(r, cfg) {
   if (cfg.mode !== 'zen' && cfg.mode !== 'custom') return LAYOUTS[cfg.lang] || LAYOUTS.en;
-  const keys = Object.keys(r.presses).join('');
+  // имя клавиши «space» - не буквы: иначе оно шло за пять латинских, и короткий русский текст получал QWERTY
+  const keys = Object.keys(r.presses).filter((k) => k !== 'space').join('');
   if (/[іїєґ]/.test(keys)) return LAYOUTS.uk;
   const cyr = (keys.match(/[\u0400-\u04FF]/g) || []).length, lat = (keys.match(/[a-z]/g) || []).length;
   if (cyr > lat) return LAYOUTS.ru;

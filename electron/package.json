@@ -1,8 +1,8 @@
 {
   "name": "writing-speed",
   "productName": "WritingSpeed",
-  "version": "1.1.1",
-  "description": "WritingSpeed - offline typing speed test: time, words, quotes, custom text and zen; six languages and code",
+  "version": "1.1.2",
+  "description": "WritingSpeed - offline typing speed test: time, words, texts, custom text and zen; six languages and code",
   "main": "main.js",
   "author": "ALEXalesha",
   "license": "MIT",
