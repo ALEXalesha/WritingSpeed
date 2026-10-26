@@ -1,12 +1,14 @@
 <div align="center">
 
+<img src="electron/icon.png" width="96" alt="">
+
 # WritingSpeed
 
 **«Скорость печати» (WritingSpeed) - тест скорости печати одной страницей HTML. Работает без сервера и без интернета: откройте `index.html`, пользуйтесь на сайте или поставьте программу для Windows.**
 
 [**▶ Открыть на сайте →**](https://alexalesha.github.io/WritingSpeed/) &nbsp;·&nbsp; [Скачать для Windows](https://github.com/ALEXalesha/WritingSpeed/releases/latest) &nbsp;·&nbsp; [English version of this file](README.md)
 
-[![Status](https://img.shields.io/badge/status-stable-brightgreen)](#) [![Release](https://img.shields.io/github/v/release/ALEXalesha/WritingSpeed)](https://github.com/ALEXalesha/WritingSpeed/releases/latest) [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE) [![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/docs/Web/HTML) [![Electron](https://img.shields.io/badge/Electron-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/) [![Website](https://img.shields.io/badge/Website-open-0A84FF?logo=googlechrome&logoColor=white)](https://alexalesha.github.io/WritingSpeed/) [![Built with Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-D97757?logo=claude&logoColor=white)](https://claude.com/claude-code)
+[![Status](https://img.shields.io/badge/status-stable-brightgreen)](#) [![Release](https://img.shields.io/github/v/release/ALEXalesha/WritingSpeed)](https://github.com/ALEXalesha/WritingSpeed/releases/latest) [![CI](https://github.com/ALEXalesha/WritingSpeed/actions/workflows/ci.yml/badge.svg)](https://github.com/ALEXalesha/WritingSpeed/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE) [![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/docs/Web/HTML) [![Electron](https://img.shields.io/badge/Electron-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/) [![Website](https://img.shields.io/badge/Website-open-0A84FF?logo=googlechrome&logoColor=white)](https://alexalesha.github.io/WritingSpeed/) [![Built with Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-D97757?logo=claude&logoColor=white)](https://claude.com/claude-code)
 
 Код, тесты и документация этого проекта написаны Claude (Anthropic) в Claude Code. Идеи, проверка и решения - Алексей.
 
