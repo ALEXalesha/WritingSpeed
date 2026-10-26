@@ -987,16 +987,19 @@ test.describe('ws: нажатие в меню', () => {
   for (const [row, btn] of [['#modes', '[data-mode=words]'], ['#flags', '[data-flag=caps]'], ['[data-ctl=times]', '[data-time="60"]']]) {
     test(`${row}: при нажатии меняется только кнопка, ряд не подсвечивается и не выделяется`, async ({ page }) => {
       await openWs(page);
-      const rowBox = await page.locator(row).boundingBox();
-      const b = await page.locator(btn).boundingBox();
-      await page.mouse.move(b.x + 6, b.y + b.height / 2);
-      const clip = { x: rowBox.x - 2, y: rowBox.y - 2, width: rowBox.width + 4, height: rowBox.height + 4 };
-      await page.waitForTimeout(300);                                     // наведение - без перехода цвета
-      const before = await page.screenshot({ clip, mask: [page.locator(row + ' button')] });
       // нажатие на кнопке и в зазоре рядом, мышь зажата и сдвигается на 40 px. Кнопки ряда закрыты
       // маской: мышь доезжает до соседней кнопки, и та честно светится наведением - это не ряд.
-      for (const startX of [b.x + 6, b.x - 2]) {
+      // Снимок «до» - перед каждым нажатием: первое нажатие на #modes меняет режим, и в меню
+      // появляются выпадающие списки. На linux они на 2 px выше кнопок, и ряд съезжает на 1 px -
+      // сравнение с кадром до первого нажатия давало 210 уровней без всякой подсветки.
+      for (const shift of [6, -2]) {
+        const rowBox = await page.locator(row).boundingBox();
+        const b = await page.locator(btn).boundingBox();
+        const startX = b.x + shift;
+        const clip = { x: rowBox.x - 2, y: rowBox.y - 2, width: rowBox.width + 4, height: rowBox.height + 4 };
         await page.mouse.move(startX, b.y + b.height / 2);
+        await page.waitForTimeout(300);                                   // наведение - без перехода цвета
+        const before = await page.screenshot({ clip, mask: [page.locator(row + ' button')] });
         await page.mouse.down();
         await page.mouse.move(startX + 40, b.y + b.height / 2 + 2, { steps: 4 });
         await page.waitForTimeout(300);
